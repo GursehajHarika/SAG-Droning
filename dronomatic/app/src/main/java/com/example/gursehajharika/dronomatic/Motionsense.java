@@ -1,5 +1,8 @@
 package com.example.gursehajharika.dronomatic;
 
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +23,7 @@ public class Motionsense extends AppCompatActivity {
 
     public EditText motionreadings;
     ArrayList<String> readingm = new ArrayList<String>();
+    private ActionBar toolbar;
 
 
     @Override
@@ -36,20 +40,25 @@ public class Motionsense extends AppCompatActivity {
 
 
         //return button.
-        homer = (Button)findViewById(R.id.button);
+        homer = findViewById(R.id.button);
         homer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
-      motionreadings = (EditText)findViewById(R.id.motionView);
+      motionreadings = findViewById(R.id.motionView);
       motionsensereading();
       for (int i = 0;i<readingm.size();i++){
-          motionreadings.append(readingm.get(i));
-
+        //  motionreadings.append(readingm.get(i));
+          motionreadings.setText(motionreadings.getText() + readingm.get(i));
       }
-        motionreadings.setText(Arrays.toString(new ArrayList[]{readingm}));
+
+        toolbar = getSupportActionBar();
+
+        BottomNavigationView navigation = findViewById(R.id.bottomNavigationView);
+        navigation.setOnNavigationItemSelectedListener(bottomnavigationbar);
+
     }
 
     //Data readings
@@ -87,4 +96,28 @@ public class Motionsense extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener bottomnavigationbar = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+            if (menuItem.getItemId() == R.id.bottomtemp){
+                finish();
+                Intent bottomtemperature = new Intent(Motionsense.this,temperature.class);
+                startActivity(bottomtemperature);
+
+            }
+            else if (menuItem.getItemId() == R.id.bottomotion){
+                finish();
+                Intent bottommotion = new Intent(Motionsense.this,Motionsense.class);
+                startActivity(bottommotion);
+            }
+            else{
+                finish();
+                Intent bottombaro = new Intent(Motionsense.this,baropress.class);
+                startActivity(bottombaro);
+            }
+            return false;
+        }
+    };
+
 }

@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 public class Loginwelcome extends AppCompatActivity {
 
+
+
   public TextView usernm;
     private static int SPLASH_TIME_OUT = 1500 ;
 
@@ -19,7 +21,8 @@ public class Loginwelcome extends AppCompatActivity {
         setContentView(R.layout.activity_loginwelcome);
 
         setTitle("");
-        usernm = (TextView) findViewById(R.id.textView2);
+        //defined the string used in HomeActivity to use the data passed from it.
+        usernm = findViewById(R.id.textView2);
         usernm.setText(""+ getIntent().getStringExtra("User") );
 
         new Handler().postDelayed(new Runnable(){
@@ -32,8 +35,7 @@ public class Loginwelcome extends AppCompatActivity {
                 homeIntent.putExtra("session",usersession);
                 startActivity(homeIntent);
 
-             //   String quitmsg = .getText().toString();
-             //   Intent quiter = new Intent();
+
 
                 finish();
 

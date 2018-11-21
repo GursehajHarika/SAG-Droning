@@ -17,7 +17,8 @@ public class loginwelcomeadmin extends AppCompatActivity {
         setContentView(R.layout.activity_loginwelcomeadmin);
 
         setTitle("");
-        usernm = (TextView) findViewById(R.id.textView2);
+        //used the string defined in HomeActivity
+        usernm = findViewById(R.id.textView2);
         usernm.setText(""+ getIntent().getStringExtra("User") );
 
         new Handler().postDelayed(new Runnable(){
@@ -30,8 +31,6 @@ public class loginwelcomeadmin extends AppCompatActivity {
                 homeIntent.putExtra("session",usersession);
                 startActivity(homeIntent);
 
-                //   String quitmsg = .getText().toString();
-                //   Intent quiter = new Intent();
 
                 finish();
 

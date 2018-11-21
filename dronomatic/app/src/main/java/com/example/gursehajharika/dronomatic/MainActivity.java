@@ -9,6 +9,8 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    //define before creating a splash screen
     private static int SPLASH_TIME_OUT = 2500 ;
 
 
@@ -20,12 +22,14 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle("");
 
+
+        //splash screen creation.
         new Handler().postDelayed(new Runnable(){
 
             @Override
             public void run(){
 
-
+//intent used to go to the login page that is named as (HomeActivity).
                 Intent homeIntent = new Intent(MainActivity.this, HomeActivity.class);
 
                 startActivity(homeIntent);
@@ -37,4 +41,5 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 }

@@ -2,7 +2,9 @@ package com.example.gursehajharika.dronomatic;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -27,7 +29,7 @@ public class temperature extends AppCompatActivity {
     public Button homer;
     public EditText readingt;
     ArrayList<String> tempreadings = new ArrayList<String>();
-
+    private ActionBar toolbar;
 
     private void  arrayconstruction(){
         tempreadings.add("Temperature  ------    Time\n ");
@@ -84,22 +86,29 @@ public class temperature extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        readingt = (EditText) findViewById(R.id.TextView);
+        readingt = findViewById(R.id.TextView);
         arrayconstruction();
         for(int i=0;i<tempreadings.size();i++) {
-            readingt.append(tempreadings.get(i));
 
+            readingt.setText(readingt.getText() + tempreadings.get(i));
+            //readingt.append(tempreadings.get(i));
         }
-        readingt.setText(Arrays.toString(new ArrayList[]{tempreadings}));
 
 
-        homer = (Button)findViewById(R.id.button);
+        homer = findViewById(R.id.button);
         homer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
+
+
+        toolbar = getSupportActionBar();
+
+        BottomNavigationView navigation = findViewById(R.id.bottomNavigationView);
+        navigation.setOnNavigationItemSelectedListener(bottomnavigationbar);
+
     }
 
     @Override
@@ -111,4 +120,26 @@ public class temperature extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+private BottomNavigationView.OnNavigationItemSelectedListener bottomnavigationbar = new BottomNavigationView.OnNavigationItemSelectedListener() {
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.bottomtemp){
+            finish();
+            Intent bottomtemperature = new Intent(temperature.this,temperature.class);
+            startActivity(bottomtemperature);
+
+        }
+        else if (menuItem.getItemId() == R.id.bottomotion){
+            finish();
+            Intent bottommotion = new Intent(temperature.this,Motionsense.class);
+            startActivity(bottommotion);
+        }
+        else{
+            finish();
+            Intent bottombaro = new Intent(temperature.this,baropress.class);
+            startActivity(bottombaro);
+        }
+        return false;
+    }
+};
 }

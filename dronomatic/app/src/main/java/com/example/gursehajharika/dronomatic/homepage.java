@@ -1,22 +1,22 @@
 package com.example.gursehajharika.dronomatic;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
@@ -26,6 +26,8 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
     private ActionBarDrawerToggle mToggle ;
     Spinner spinner;
     ArrayAdapter<CharSequence> adapter;
+    private FirebaseAuth mAuth;
+
 
     //variables for cardview temperature.
     private CardView cardView;
@@ -44,46 +46,48 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
 
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
 
-        mDrawerLayout=(DrawerLayout)findViewById(R.id.drawer) ;
+
+        mDrawerLayout= findViewById(R.id.drawer);
         mToggle= new ActionBarDrawerToggle(homepage.this,mDrawerLayout,R.string.open,R.string.close);
 
         mDrawerLayout.addDrawerListener(mToggle);
         mToggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        NavigationView navigationView=(NavigationView)findViewById(R.id.navigation_view);
+        NavigationView navigationView= findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
 
         //Temrature Card view initalization
 
-        cardView = (CardView)findViewById(R.id.Tempcard);
-        temptextview = (TextView) findViewById(R.id.temptextview);
+        cardView = findViewById(R.id.Tempcard);
+        temptextview = findViewById(R.id.temptextview);
         temreadingcardview();
         for (int i=0;i<temcarview.size();i++){
             temptextview.append(temcarview.get(i));
         }
 
         //barometric Carview initalization.
-        cardView2 = (CardView)findViewById(R.id.barcard);
-        barotextview = (TextView) findViewById(R.id.barotextview);
+        cardView2 = findViewById(R.id.barcard);
+        barotextview = findViewById(R.id.barotextview);
         baroreadingcardview();
         for (int i=0;i<barocarview.size();i++){
             barotextview.append(barocarview.get(i));
         }
 
         //Motion sensor Cardview initalization.
-        cardview3 =(CardView)findViewById(R.id.motioncard);
-        motiontext = (TextView)findViewById(R.id.motiontextview);
+        cardview3 = findViewById(R.id.motioncard);
+        motiontext = findViewById(R.id.motiontextview);
         motionreadingcardview();
         for (int i = 0; i<motioncardview.size();i++){
             motiontext.append(motioncardview.get(i));
         }
-
 
         //User's name for personalization.
 
@@ -93,7 +97,7 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
 
         //Spinner for Sensor selection started.
 
-        spinner = (Spinner)findViewById(R.id.spinner);
+        spinner = findViewById(R.id.spinner);
         adapter = ArrayAdapter.createFromResource(this,R.array.sensorname,android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -143,16 +147,17 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
         });
     }
 
+    //navigation drawer implimentation.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-       if(mToggle.onOptionsItemSelected(item)){
+        if(mToggle.onOptionsItemSelected(item)){
 
-           return true;
-       }
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
-
+//navigation drawer content.
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
@@ -161,6 +166,7 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
         {
             // goes back to home.
            // Toast.makeText(this,"you are at home right now",Toast.LENGTH_SHORT).show();
+
             Intent account = new Intent(homepage.this,Accountinfo.class);
             startActivity(account);
         }
@@ -185,7 +191,7 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
         else if (id ==R.id.settings)
         {
             // go to settings
-            Intent temp = new Intent(this,contactus.class);
+            Intent temp = new Intent(this,settings.class);
             startActivity(temp);
         }
         else if (id ==R.id.contact)
@@ -196,6 +202,8 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
         }
         else
         {
+
+
            //go to logout
             Toast.makeText(this,"You have been logged out.",Toast.LENGTH_LONG).show();
             finish();

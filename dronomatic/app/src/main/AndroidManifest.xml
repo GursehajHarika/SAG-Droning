@@ -34,7 +34,8 @@
         <activity android:name=".loginwelcomeadmin" />
         <activity android:name=".Accountinfo" />
         <activity android:name=".contactus" />
-        <activity android:name=".settings"></activity>
+        <activity android:name=".settings" />
+        <activity android:name=".contactuserror"></activity>
     </application>
 
 </manifest>

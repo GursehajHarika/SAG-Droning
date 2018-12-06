@@ -24,21 +24,16 @@ public class Loginwelcome extends AppCompatActivity {
         //defined the string used in HomeActivity to use the data passed from it.
         usernm = findViewById(R.id.textView2);
         usernm.setText(""+ getIntent().getStringExtra("User") );
-
+        //Used to Create a delay of 1500ms.
         new Handler().postDelayed(new Runnable(){
 
             @Override
             public void run(){
-
                 String usersession = usernm.getText().toString();
                 Intent homeIntent = new Intent(Loginwelcome.this, homepage.class);
                 homeIntent.putExtra("session",usersession);
                 startActivity(homeIntent);
-
-
-
                 finish();
-
             }
         },SPLASH_TIME_OUT);
     }

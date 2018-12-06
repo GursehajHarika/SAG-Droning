@@ -4,7 +4,9 @@ package com.example.gursehajharika.dronomatic;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.nfc.Tag;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,8 +20,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -44,14 +48,18 @@ public class HomeActivity extends AppCompatActivity {
     private int counter = 3;
     private TextView tv;
     public MenuView.ItemView quit;
-    public CheckBox saver;
+    public ToggleButton saver;
     private FirebaseAuth mAuth;
+    private static int SPLASH_TIME_OUT = 1500 ;
+
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     public Button signout;
 
     private static final String TAG = "HomeActivity";
 
+
+    //Not Using this for now -----------
     public void AuthenticationDB(){
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -75,7 +83,7 @@ public class HomeActivity extends AppCompatActivity {
         };
 
     }
-
+//--------- till here.
 
 
     public void reg() {
@@ -98,19 +106,56 @@ public class HomeActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         password = findViewById(R.id.password);
         email = findViewById(R.id.email);
-        saver = findViewById(R.id.checkBox);
+        saver = findViewById(R.id.toggleButton);
         signout = (Button)findViewById(R.id.signout);
+
+
+
 
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 String emails = email.getText().toString();
                 String pass = password.getText().toString();
+                authenti(emails,pass);
+            }
+        });
 
+        saver.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if(isChecked){
+                    //Uses the TOggle buttons online option.
+                    saver.setBackgroundColor(Color.parseColor("#C6FF00"));
+                    toastmessage("App is now Online");
+                    online();
+                }
+                else {
+                    //Uses the toggle button's offline option
+                    saver.setBackgroundResource(android.R.drawable.btn_default);
+                    toastmessage("App is now Offline");
+                    signin.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String emails = email.getText().toString();
+                            String pass = password.getText().toString();
+                               authenti(emails,pass);
+                        }
+                    });
+                }
+            }
+        });
+    }
+    public void online(){
+
+        signin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String emails = email.getText().toString();
+                String pass = password.getText().toString();
                 if(!emails.equals("") && !pass.equals("")){
-
-                  //  mAuth.signInWithEmailAndPassword(emails,pass);
+                    //  mAuth.signInWithEmailAndPassword(emails,pass);
                     mAuth.signInWithEmailAndPassword(emails, pass)
                             .addOnCompleteListener(HomeActivity.this, new OnCompleteListener<AuthResult>() {
                                 @Override
@@ -123,25 +168,19 @@ public class HomeActivity extends AppCompatActivity {
                                         Intent sign = new Intent(HomeActivity.this, loginwelcomeadmin.class);
                                         sign.putExtra("User", nameuser);
                                         startActivity(sign);
-                                        //updateUI(user);
+
                                     } else {
                                         // If sign in fails, display a message to the user.
                                         Log.w(TAG, "signInWithEmail:failure", task.getException());
-                                        //Toast.makeText(HomeActivity.this, "Authentication failed.",
-                                                Toast.makeText(HomeActivity.this,"",Toast.LENGTH_SHORT).show();
-                                        //updateUI(null);
-                                    }
 
-                                    // ...
+                                        Toast.makeText(HomeActivity.this,"",Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
-;
                 }
                 else {
                     Toast.makeText(HomeActivity.this, "Forgot to fill in the EMail and Passsord", Toast.LENGTH_SHORT).show();
                 }
-              //  authenti(email.getText().toString(), password.getText().toString());
-
                 signout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -151,13 +190,8 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
-
     }
-
-
-
     //Login authentication
-
     private void authenti(String userName, String userPassword) {
         if ((userName.equals("Gursehaj")) && (userPassword.equals("Gursehaj"))) {
             String nameuser = email.getText().toString();
@@ -165,8 +199,7 @@ public class HomeActivity extends AppCompatActivity {
             sign.putExtra("User", nameuser);
             startActivity(sign);
         } else if (userName.equals("Shubham") && (userPassword.equals("$hubham"))) {
-
-                //defined string to send data from one activity to another.
+            //defined string to send data from one activity to another.
             String nameuser = email.getText().toString();
             Intent sign = new Intent(HomeActivity.this, loginwelcomeadmin.class);
 
@@ -199,9 +232,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-
     //Login Attempts Counter
-
     public void attemps() {
 
         tv = findViewById(R.id.tvinfo);
@@ -209,6 +240,20 @@ public class HomeActivity extends AppCompatActivity {
 
         if (counter == 0) {
             signin.setEnabled(false);
+
+            new Handler().postDelayed(new Runnable(){
+
+                @Override
+                public void run(){
+                    Intent homeIntent = new Intent(HomeActivity.this, contactuserror.class);
+                    startActivity(homeIntent);
+
+                    finish();
+
+                }
+            },SPLASH_TIME_OUT);
+
+
         } else {
             signin.setEnabled(true);
         }
@@ -277,8 +322,8 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-      // mAuth.addAuthListener(mAuthListener);
-        //updateUI(currentUser);
+      // mAuthupdateUI.addAuthListener(mAuthListener);
+        //(currentUser);
     }
 
     @Override
@@ -287,5 +332,8 @@ public class HomeActivity extends AppCompatActivity {
         if(mAuthListener != null){
             mAuth.removeAuthStateListener(mAuthListener);
         }
+    }
+    private void toastmessage(String message){
+        Toast.makeText(HomeActivity.this,message,Toast.LENGTH_SHORT).show();
     }
 }

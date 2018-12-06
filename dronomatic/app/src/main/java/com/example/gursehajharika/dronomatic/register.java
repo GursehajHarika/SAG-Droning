@@ -28,11 +28,12 @@ public class register extends AppCompatActivity {
     private EditText lname;
     private EditText emailaddress;
     private EditText proID;
-    private String userID;
     private static final String TAG = "register";
-
+private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mAuth;
-    FirebaseAuth firebaseAuth;
+    private FirebaseAuth firebaseAuth;
+    private String userID;
+
 
     DatabaseReference dbr;
 
@@ -65,6 +66,25 @@ public class register extends AppCompatActivity {
         });
     }
 
+    public void sett(){
+
+
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference name = database.getReference("Firstname");
+        DatabaseReference passw = database.getReference("password");
+        DatabaseReference lname = database.getReference("Lastname");
+        DatabaseReference product = database.getReference("ProductID");
+        DatabaseReference emailaddr = database.getReference("email");
+
+
+    //    FirebaseUser user = mAuth.getCurrentUser();
+       // userID = user.getUid();
+        Userinformation userinformation = new Userinformation(firstname,emailaddres,password,productstring,userID);
+        dbr.child("user").child(userID).setValue(userinformation);
+
+
+    }
 
     public void creator(){
 
@@ -84,28 +104,15 @@ public class register extends AppCompatActivity {
 
 
     //Writing to the Database.
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference name = database.getReference("Firstname");
-    DatabaseReference passw = database.getReference("password");
-    DatabaseReference lname = database.getReference("Lastname");
-    DatabaseReference product = database.getReference("ProductID");
-    DatabaseReference emailaddr = database.getReference("email");
 
     //Creates New user.
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        dbr = mFirebaseDatabase.getReference();
+        FirebaseUser user = mAuth.getCurrentUser();
 
-
-    firebaseAuth = FirebaseAuth.getInstance();
-    dbr = FirebaseDatabase.getInstance().getReference();
-    auther(emailaddres,password);
-    Userinformation userinformation = new Userinformation(firstname,emailaddres,password,productstring);
-
-    dbr.child("user").push().setValue(userinformation);
-
-
-
-
-
-
+        auther(emailaddres,password);
+        sett();
   //  name.setValue(firstname);
   //  passw.setValue(password);
   //  lname.setValue(lastname);
@@ -114,10 +121,8 @@ public class register extends AppCompatActivity {
 
     Toast.makeText(this,"User has been created.",Toast.LENGTH_LONG).show();
     finish();
-
 }
  public void auther(String emailaddres, String password){
-
      mAuth.createUserWithEmailAndPassword(emailaddres, password)
              .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                  @Override
@@ -125,10 +130,9 @@ public class register extends AppCompatActivity {
                      if (task.isSuccessful()) {
                          // Sign in success, update UI with the signed-in user's information
                          Log.d(TAG, "createUserWithEmail:success");
-                         FirebaseUser user = mAuth.getCurrentUser();
-                         userID = user.getUid();
-
-
+                        FirebaseUser userID = mAuth.getCurrentUser();
+                       // sett();
+Log.d(TAG,"Current User ID" + mAuth);
                      } else {
                          // If sign in fails, display a message to the user.
                          Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -141,15 +145,11 @@ public class register extends AppCompatActivity {
                  }
              });
  }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
         mAuth = FirebaseAuth.getInstance();
-
 
         backtostart();
         reger();

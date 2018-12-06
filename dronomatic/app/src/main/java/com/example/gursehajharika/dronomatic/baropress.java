@@ -3,6 +3,7 @@ package com.example.gursehajharika.dronomatic;
 import android.content.Intent;
 import android.nfc.Tag;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +11,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,7 +28,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+
+
 
 public class baropress extends AppCompatActivity {
 
@@ -33,17 +39,15 @@ public class baropress extends AppCompatActivity {
     private ActionBar toolbar;
     public ListView listView ;
     public ListView listView2;
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference Reading = database.getReference("Reading");
-
     private static final String TAG = "baropress";
+    public TextView testreading;
+    public TextView testtimer;
+
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthlistener;
+  //  private FirebaseAuth.AuthStateListener mAuthlistener;
     private DatabaseReference mRef;
-
-    String Userid;
-   // String DESCRIPTION;
+    private String userID, readings,timer;
 
    String[] TIMER = {"10:30","10:31","10:32","10:33","10:34","10:35","10:36","10:37","10:38","10:39","10:30","10:31","10:32","10:33"};
    String[] DESCRIPTION = {"200ft   --  31.02","400ft   --  35.02","200ft   --  31.02","400ft   --  35.02","200ft   --  31.02","400ft   --  35.02","200ft   --  31.02","400ft   --  35.02","200ft   --  31.02","400ft   --  35.02","200ft   --  31.02","400ft   --  35.02","200ft   --  31.02","400ft   --  35.02"};
@@ -98,6 +102,11 @@ public class baropress extends AppCompatActivity {
 
         setTitle("Barometric Pressure");
 
+
+        databaseread();
+
+
+
         //Array for creating values on the page.
 
                 //   readingb = findViewById(R.id.TextView);
@@ -109,45 +118,12 @@ public class baropress extends AppCompatActivity {
       //   readingb.setText(Arrays.toString(new ArrayList[]{baroreadings}));
 
 
-/*
-        // Read from the database
-        Reading.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                String DESCRIPTION = dataSnapshot.getValue(String.class);
-
-            }
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-
-            }
-        });
-
-
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mRef = mFirebaseDatabase.getReference();
-
-
-        mRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                showData(dataSnapshot);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-*/
-        listView = (ListView)findViewById(R.id.listview);
-        listView2 = (ListView)findViewById(R.id.listview2);
-        ListAdapter listAdapter = new Baropress_customAdapter(this,TIMER);
-        ListAdapter listAdapter1= new Baropress_customAdapter1(this,DESCRIPTION);
-        listView.setAdapter(listAdapter1);
-        listView2.setAdapter(listAdapter);
+    //    listView = (ListView)findViewById(R.id.listview);
+       // listView2 = (ListView)findViewById(R.id.listview2);
+      //  ListAdapter listAdapter = new Baropress_customAdapter(this,TIMER);
+     //   ListAdapter listAdapter1= new Baropress_customAdapter1(this,DESCRIPTION);
+      //  listView.setAdapter(listAdapter1);
+        //listView2.setAdapter(listAdapter);
 
         homer = findViewById(R.id.button);
         homer.setOnClickListener(new View.OnClickListener() {
@@ -156,21 +132,117 @@ public class baropress extends AppCompatActivity {
                 finish();
             }
         });
-
         toolbar = getSupportActionBar();
         BottomNavigationView navigation = findViewById(R.id.bottomNavigationView);
         navigation.setOnNavigationItemSelectedListener(bottomnavigationbar);
+    }
+
+    public void databaseread(){
+
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mRef = mFirebaseDatabase.getReference();
+        FirebaseUser user = mAuth.getCurrentUser();
+        userID = user.getUid();
+
+        mRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                shower(dataSnapshot);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void shower(DataSnapshot dataSnapshot) {
+
+        ArrayList<String> array = new ArrayList<>();
+
+        //Object 1.
+        baropress_databaseread uinfor = new baropress_databaseread(readings,timer);
+
+
+        uinfor.setValuer(dataSnapshot.child("Reading").child("read1").getValue(baropress_databaseread.class).getValuer());
+        uinfor.setTimestamp(dataSnapshot.child("Reading").child("read1").getValue(baropress_databaseread.class).getTimestamp());
+        array.add(uinfor.getTimestamp());
+        array.add(uinfor.getValuer());
+
+        //object 2.
+        baropress_databaseread uinfor2 = new baropress_databaseread(readings,timer);
+        uinfor2.setValuer(dataSnapshot.child("Reading").child("read2").getValue(baropress_databaseread.class).getValuer());
+        uinfor2.setTimestamp(dataSnapshot.child("Reading").child("read2").getValue(baropress_databaseread.class).getTimestamp());
+
+        Log.d(TAG," \n \n Showing Readings For Object 2 " + uinfor2.getTimestamp());
+        Log.d(TAG," \n \n Showing Time For object 2 " + uinfor2.getValuer());
+
+        array.add(uinfor2.getTimestamp());
+        array.add(uinfor2.getValuer());
+
+
+        //object3
+        baropress_databaseread uinfor3 = new baropress_databaseread(readings,timer);
+        uinfor3.setValuer(dataSnapshot.child("Reading").child("read3").getValue(baropress_databaseread.class).getValuer());
+        uinfor3.setTimestamp(dataSnapshot.child("Reading").child("read3").getValue(baropress_databaseread.class).getTimestamp());
+
+        Log.d(TAG," \n \n Showing Readings For Object 3 " + uinfor3.getTimestamp());
+        Log.d(TAG," \n \n Showing Time For object 3 " + uinfor3.getValuer());
+
+
+        array.add(uinfor3.getTimestamp());
+        array.add(uinfor3.getValuer());
+
+
+        //object 4
+        baropress_databaseread uinfor4 = new baropress_databaseread(readings,timer);
+        uinfor4.setValuer(dataSnapshot.child("Reading").child("read4").getValue(baropress_databaseread.class).getValuer());
+        uinfor4.setTimestamp(dataSnapshot.child("Reading").child("read4").getValue(baropress_databaseread.class).getTimestamp());
+
+        Log.d(TAG," \n \n Showing Readings For Object 4 " + uinfor4.getTimestamp());
+        Log.d(TAG," \n \n Showing Time For object 4 " + uinfor4.getValuer());
+
+
+
+        array.add(uinfor4.getTimestamp());
+        array.add(uinfor4.getValuer());
+
+        //object 5
+
+        baropress_databaseread uinfor5 = new baropress_databaseread(readings,timer);
+        uinfor5.setValuer(dataSnapshot.child("Reading").child("read5").getValue(baropress_databaseread.class).getValuer());
+        uinfor5.setTimestamp(dataSnapshot.child("Reading").child("read5").getValue(baropress_databaseread.class).getTimestamp());
+
+        Log.d(TAG," \n \n Showing Readings For Object 4 " + uinfor5.getTimestamp());
+        Log.d(TAG," \n \nShowing Time For object 4 " + uinfor5.getValuer());
+
+        array.add(uinfor5.getTimestamp());
+        array.add(uinfor5.getValuer());
+
+
+
+        //ListView to display the data.
+        listView = (ListView)findViewById(R.id.listview);
+        ArrayAdapter adapter = new ArrayAdapter(baropress.this,android.R.layout.simple_list_item_1,array);
+        listView.setAdapter(adapter);
+
+        //Tester Textview
+        testtimer = (TextView)findViewById(R.id.testertime);
+        testreading = (TextView)findViewById(R.id.testerreading);
+        testtimer.setVisibility(View.INVISIBLE);
+        testreading.setVisibility(View.INVISIBLE);
+        testtimer.setText("Tester");
+        testreading.setText("tester");
+
+
+
+
+
+
 
     }
 
-    private void showData(DataSnapshot dataSnapshot) {
-        DataSnapshot ds = (DataSnapshot) dataSnapshot.getChildren();
-
-        if (ds != null){
-       //     DESCRIPTION =
-        }
-
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

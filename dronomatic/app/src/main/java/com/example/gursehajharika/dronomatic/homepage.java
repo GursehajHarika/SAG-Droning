@@ -8,26 +8,41 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class homepage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+
+    private static final String TAG = "Homepage";
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mToggle ;
     Spinner spinner;
     ArrayAdapter<CharSequence> adapter;
     private FirebaseAuth mAuth;
-
+    public ListView listView ;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     //variables for cardview temperature.
     private CardView cardView;
@@ -44,6 +59,126 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
     private TextView motiontext;
     ArrayList<String>motioncardview = new ArrayList<>();
 
+
+    //Database Values
+    private FirebaseDatabase mFirebaseDatabase;
+    //private FirebaseAuth.AuthStateListener mAuthlistener;
+    private DatabaseReference mRef;
+    private String userID, readings,timer;
+
+
+
+
+    //Database Readings
+
+
+
+
+    public void databaseread(){
+
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mRef = mFirebaseDatabase.getReference();
+        FirebaseUser user = mAuth.getCurrentUser();
+        userID = user.getUid();
+
+
+        mRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                shower(dataSnapshot);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+    public void shower(DataSnapshot dataSnapshot){
+
+
+        baropress_databaseread uinfor = new baropress_databaseread(readings,timer);
+        ArrayList<String> barocarview = new ArrayList<String>();
+
+        uinfor.setValuer(dataSnapshot.child("user").child(userID).child("Reading").child("read1").getValue(baropress_databaseread.class).getValuer());
+        uinfor.setTimestamp(dataSnapshot.child("user").child(userID).child("Reading").child("read1").getValue(baropress_databaseread.class).getTimestamp());
+        barocarview.add(" Time : " + convertTimestamp(uinfor.getTimestamp()));
+        barocarview.add("\n \n Readings : " + uinfor.getValuer());
+        convertTimestamp(uinfor.getTimestamp());
+        Log.d(TAG," Converted Time Stamp is" + convertTimestamp(uinfor.getTimestamp()));
+
+        uinfor.setValuer(dataSnapshot.child("user").child(userID).child("Reading").child("read2").getValue(baropress_databaseread.class).getValuer());
+        uinfor.setTimestamp(dataSnapshot.child("user").child(userID).child("Reading").child("read2").getValue(baropress_databaseread.class).getTimestamp());
+        barocarview.add("\n \n Time : " + convertTimestamp(uinfor.getTimestamp()));
+        barocarview.add("\n \n Readings : " + uinfor.getValuer());
+        convertTimestamp(uinfor.getTimestamp());
+        Log.d(TAG," Converted Time Stamp is" + convertTimestamp(uinfor.getTimestamp()));
+
+        barotextview.setText("" +barocarview);
+    }
+
+
+    public void databasereadTemp(){
+
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mRef = mFirebaseDatabase.getReference();
+        FirebaseUser user = mAuth.getCurrentUser();
+        userID = user.getUid();
+
+
+        mRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                showernew(dataSnapshot);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+    public void showernew(DataSnapshot dataSnapshot){
+
+
+        baropress_databaseread uinfor = new baropress_databaseread(readings,timer);
+        ArrayList<String> barocarview = new ArrayList<String>();
+
+        uinfor.setValuer(dataSnapshot.child("user").child(userID).child("Temperature").child("read1").getValue(baropress_databaseread.class).getValuer());
+        uinfor.setTimestamp(dataSnapshot.child("user").child(userID).child("Temperature").child("read1").getValue(baropress_databaseread.class).getTimestamp());
+        temcarview.add(" Time : " + convertTimestamp(uinfor.getTimestamp()));
+        barocarview.add("\n \n Readings : " + uinfor.getValuer());
+        convertTimestamp(uinfor.getTimestamp());
+        Log.d(TAG," Converted Time Stamp is" + convertTimestamp(uinfor.getTimestamp()));
+
+        uinfor.setValuer(dataSnapshot.child("user").child(userID).child("Temperature").child("read2").getValue(baropress_databaseread.class).getValuer());
+        uinfor.setTimestamp(dataSnapshot.child("user").child(userID).child("Temperature").child("read2").getValue(baropress_databaseread.class).getTimestamp());
+        barocarview.add("\n \n Time : " + convertTimestamp(uinfor.getTimestamp()));
+        barocarview.add("\n \n Readings : " + uinfor.getValuer());
+        convertTimestamp(uinfor.getTimestamp());
+        Log.d(TAG," Converted Time Stamp is" + convertTimestamp(uinfor.getTimestamp()));
+
+        barotextview.setText("" +barocarview);
+    }
+
+
+
+
+
+    //Ended-databsee stuff
+
+
+    private String convertTimestamp(String timestamp){
+
+        long yourSeconds = Long.valueOf(timestamp);
+        Date mDate = new Date(yourSeconds * 1000);
+        DateFormat df = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
+        return df.format(mDate);
+    }
 
 
 
@@ -66,20 +201,13 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
 
         //Temrature Card view initalization
 
-        cardView = findViewById(R.id.Tempcard);
-        temptextview = findViewById(R.id.temptextview);
-        temreadingcardview();
-        for (int i=0;i<temcarview.size();i++){
-            temptextview.append(temcarview.get(i));
-        }
+        cardviewtemp();
+
 
         //barometric Carview initalization.
-        cardView2 = findViewById(R.id.barcard);
-        barotextview = findViewById(R.id.barotextview);
-        baroreadingcardview();
-        for (int i=0;i<barocarview.size();i++){
-            barotextview.append(barocarview.get(i));
-        }
+
+       cardviewbaro();
+
 
         //Motion sensor Cardview initalization.
         cardview3 = findViewById(R.id.motioncard);
@@ -114,6 +242,7 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
                     cardView2.setVisibility(View.INVISIBLE);
                     cardView.setVisibility(View.VISIBLE);
                     cardview3.setVisibility(View.INVISIBLE);
+                   // cardviewtemp();
                 }
                 else if (position == 2){
 
@@ -121,6 +250,7 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
                    cardView.setVisibility(View.GONE);
                    cardView2.setVisibility(View.VISIBLE);
                    cardview3.setVisibility(View.INVISIBLE);
+                  // cardviewbaro();
                 }
                 else if (position == 3){
 
@@ -145,6 +275,21 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
 
             }
         });
+    }
+
+    public void cardviewbaro(){
+        cardView2 = findViewById(R.id.barcard);
+        barotextview = findViewById(R.id.barotextview);
+          databasereadTemp();
+
+
+    }
+    public void cardviewtemp(){
+
+        cardView = findViewById(R.id.Tempcard);
+        temptextview = findViewById(R.id.temptextview);
+        databaseread();
+
     }
 
     //navigation drawer implimentation.
@@ -249,5 +394,6 @@ public class homepage extends AppCompatActivity implements NavigationView.OnNavi
 
 
     }
+
 
 }

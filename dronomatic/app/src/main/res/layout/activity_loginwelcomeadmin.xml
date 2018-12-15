@@ -29,20 +29,20 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="216dp"
-        android:layout_height="97dp"
+        android:layout_width="349dp"
+        android:layout_height="111dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text=""
         android:textColor="#ffffff"
-        android:textSize="40sp"
+        android:textSize="36sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.781" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.176" />
 
     <ImageView
         android:id="@+id/imageView3"

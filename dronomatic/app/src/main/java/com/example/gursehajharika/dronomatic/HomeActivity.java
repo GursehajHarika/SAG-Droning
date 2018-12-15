@@ -20,7 +20,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -51,6 +50,10 @@ public class HomeActivity extends AppCompatActivity {
     public ToggleButton saver;
     private FirebaseAuth mAuth;
     private static int SPLASH_TIME_OUT = 1500 ;
+    public CheckBox saveinfo;
+    SharedPreferences sharedPref;
+
+
 
 
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -86,6 +89,10 @@ public class HomeActivity extends AppCompatActivity {
 //--------- till here.
 
 
+
+
+
+
     public void reg() {
         //linking definations with objects from xml
         signin = findViewById(R.id.signin);
@@ -100,14 +107,32 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    //Login Button onclicklistener
+    //Login Button
 
     public void goinghome() {
+        //Defined all the view.
         mAuth = FirebaseAuth.getInstance();
         password = findViewById(R.id.password);
         email = findViewById(R.id.email);
         saver = findViewById(R.id.toggleButton);
         signout = (Button)findViewById(R.id.signout);
+
+        userinfosaver();
+
+
+
+
+        Boolean checked = sharedPref.getBoolean("checkbox", false);
+        String suser = sharedPref.getString("username", "no");
+        String semail = sharedPref.getString("email", "no");
+        // set the preference based on the saved data.
+
+        Log.d(TAG," " + suser + " " + semail + "" + checked);
+
+        email.setText(suser);
+        saveinfo.setChecked(checked);
+        password.setText(semail);
+
 
 
 
@@ -122,6 +147,10 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         saver.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+
+
+
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
@@ -147,6 +176,37 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
+
+
+    //Shared Prefs to save User's login information.
+
+    public void userinfosaver() {
+        saveinfo = (CheckBox) findViewById(R.id.checkBox);
+        if (saveinfo.isChecked()) {  // save the current user name for next time use.
+            // save the current settings from UI, i.e. Username and E-mail.
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("username", email.getText().toString());
+            editor.putString("email", password.getText().toString());
+            editor.putBoolean("checkbox", saveinfo.isChecked());
+            editor.commit(); // Save the preference.
+
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
     public void online(){
 
         signin.setOnClickListener(new View.OnClickListener() {
@@ -173,7 +233,7 @@ public class HomeActivity extends AppCompatActivity {
                                         // If sign in fails, display a message to the user.
                                         Log.w(TAG, "signInWithEmail:failure", task.getException());
 
-                                        Toast.makeText(HomeActivity.this,"",Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(HomeActivity.this,"Database Error, Try Again",Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
@@ -207,7 +267,7 @@ public class HomeActivity extends AppCompatActivity {
             sign.putExtra("User", nameuser);
             startActivity(sign);
 
-        } else if (userName.equals("Arman") && (userPassword.equals("Arman"))) {
+        } else if (userName.equals("Arman") && (userPassword.equals("Velani"))) {
             String nameuser = email.getText().toString();
             Intent sign = new Intent(HomeActivity.this, loginwelcomeadmin.class);
             sign.putExtra("User", nameuser);
@@ -259,33 +319,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    //Password Saver
-
-    public void passwordsaver(View view){
-
-        saver.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences passaver = getSharedPreferences("userinfo",Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = passaver.edit();
-                editor.putString("Usernam",email.getText().toString());
-                editor.putString("Password", password.getText().toString());
-                editor.commit();
-            }
-        });
-         Toast.makeText(HomeActivity.this,"Saved Login information", Toast.LENGTH_SHORT).show();
-    }
-
-    //Saves Password to its orignal positions
-
-    public  void passwordsetter(){
-
-        SharedPreferences passaver = getSharedPreferences("userinfo",Context.MODE_PRIVATE);
-
-        email.setText(passaver.getString("Usernam",""));
-        password.setText(passaver.getString("Password",""));
-    }
-
 
     //Main
 
@@ -296,7 +329,9 @@ public class HomeActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-
+        sharedPref=this.getPreferences(Context.MODE_PRIVATE);
+        //userinfosaver();
+       // loaduserinfo();
         reg();
         goinghome();
 
@@ -318,10 +353,22 @@ public class HomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        userinfosaver();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        userinfosaver();
+    }
 
     @Override
     public void onStart() {
         super.onStart();
+      //  mAuth.addAuthStateListener(mAuthListener);
       // mAuthupdateUI.addAuthListener(mAuthListener);
         //(currentUser);
     }
